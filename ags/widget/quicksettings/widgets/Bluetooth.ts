@@ -26,7 +26,7 @@ const DeviceItem = (device: BluetoothDevice) => Widget.Box({
         Widget.Icon(device.icon_name + "-symbolic"),
         Widget.Label(device.name),
         Widget.Label({
-            label: `${device.battery_percentage}%`,
+            label: ` ${device.battery_percentage}%`,
             visible: device.bind("battery_percentage").as(p => p > 0),
         }),
         Widget.Box({ hexpand: true }),
@@ -35,7 +35,7 @@ const DeviceItem = (device: BluetoothDevice) => Widget.Box({
             visible: device.bind("connecting"),
         }),
         Widget.Switch({
-            active: device.connected,
+            active: device.bind("connected").as(p => p),
             visible: device.bind("connecting").as(p => !p),
             setup: self => self.on("notify::active", () => {
                 device.setConnection(self.active)
@@ -46,8 +46,15 @@ const DeviceItem = (device: BluetoothDevice) => Widget.Box({
 
 export const BluetoothDevices = () => Menu({
     name: "bluetooth",
-    icon: icons.bluetooth.disabled,
+    icon: bluetooth.bind("enabled").as(p => icons.bluetooth[p ? "enabled" : "disabled"]),
     title: "Bluetooth",
+    title_button: Widget.Button({
+        child: Widget.Icon({ icon: icons.ui.settings }),
+        onClicked: () => {
+            App.closeWindow('quicksettings')
+            Utils.execAsync("term-float bluetuith")
+        },
+    }),
     content: [
         Widget.Box({
             class_name: "bluetooth-devices",

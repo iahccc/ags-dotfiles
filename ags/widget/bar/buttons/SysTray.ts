@@ -26,8 +26,7 @@ const SysTrayItem = (item: TrayItem) => PanelButton({
         self.connect("destroy", () => menu.disconnect(id))
     },
 
-    on_primary_click: btn => item.menu?.popup_at_widget(
-        btn, Gdk.Gravity.SOUTH, Gdk.Gravity.NORTH, null),
+    on_primary_click: (_, event) => item.activate(event),
 
     on_secondary_click: btn => item.menu?.popup_at_widget(
         btn, Gdk.Gravity.SOUTH, Gdk.Gravity.NORTH, null),

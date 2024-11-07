@@ -1,4 +1,5 @@
 import { launchApp, icon } from "lib/utils"
+import { matchApp } from "lib/agsutil"
 import icons from "lib/icons"
 import options from "options"
 import PanelButton from "../PanelButton"
@@ -8,8 +9,17 @@ const apps = await Service.import("applications")
 const { monochrome, exclusive, iconSize } = options.bar.taskbar
 const { position } = options.bar
 
-const focus = (address: string) => hyprland.messageAsync(
-    `dispatch focuswindow address:${address}`)
+const focus = (address: string) => {
+    hyprland.messageAsync(
+        `dispatch focuswindow address:${address}`)
+    hyprland.messageAsync(
+        `dispatch alterzorder top, address:${address}`)
+}
+
+const close = (address: string) => {
+    hyprland.messageAsync(
+        `dispatch closewindow address:${address}`)
+}
 
 const DummyItem = (address: string) => Widget.Box({
     attribute: { address },
@@ -21,7 +31,8 @@ const AppItem = (address: string) => {
     if (!client || client.class === "")
         return DummyItem(address)
 
-    const app = apps.list.find(app => app.match(client.class))
+    let app = apps.list.find(app => app.wm_class?.toLowerCase() == client.class.toLowerCase())
+    app = app || apps.list.filter(app => matchApp(app, client.class))?.[0]
 
     const btn = PanelButton({
         class_name: "panel-button",
@@ -29,12 +40,12 @@ const AppItem = (address: string) => {
             hyprland.getClient(address)?.title || "",
         ),
         on_primary_click: () => focus(address),
-        on_middle_click: () => app && launchApp(app),
+        on_middle_click: () => close(address),
         child: Widget.Icon({
             size: iconSize.bind(),
             icon: monochrome.bind().as(m => icon(
                 (app?.icon_name || client.class) + (m ? "-symbolic" : ""),
-                icons.fallback.executable + (m ? "-symbolic" : ""),
+                icons.fallback.executable,
             )),
         }),
     })
@@ -44,6 +55,12 @@ const AppItem = (address: string) => {
             attribute: { address },
             visible: Utils.watch(true, [exclusive, hyprland], () => {
                 return exclusive.value
+                    ? hyprland.active.workspace.id === client.workspace.id
+                    : true
+            }),
+            setup: w => w.hook(hyprland, () => {
+                const client = hyprland.getClient(address)
+                w.visible = exclusive.value
                     ? hyprland.active.workspace.id === client.workspace.id
                     : true
             }),

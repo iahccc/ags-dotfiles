@@ -1,0 +1,50 @@
+@define-color accent_color {{ primary.bg }};
+@define-color accent_bg_color {{ primary.bg }};
+@define-color accent_fg_color {{ bg }};
+/*@define-color destructive_color {{ error_container }};*/
+/*@define-color destructive_bg_color {{ error_container }};*/
+@define-color destructive_fg_color {{ fg }};
+/*@define-color success_color {{ tertiary }};*/
+/*@define-color success_bg_color {{ tertiary }};*/
+@define-color success_fg_color {{ fg }};
+/*@define-color warning_color {{ secondary }};*/
+/*@define-color warning_bg_color {{ secondary }};*/
+@define-color warning_fg_color {{ fg }};
+/*@define-color error_color {{ error_container }};*/
+/*@define-color error_bg_color {{ error_container }};*/
+@define-color error_fg_color {{ fg }};
+@define-color window_bg_color {{ bg }};
+@define-color window_fg_color {{ fg }};
+@define-color view_bg_color {{ bg }};
+@define-color view_fg_color {{ fg }};
+@define-color headerbar_bg_color {{ bg }};
+@define-color headerbar_fg_color {{ fg }};
+@define-color headerbar_border_color {{ border }};
+@define-color headerbar_backdrop_color {{ bg }};
+@define-color headerbar_shade_color {{ border }};
+@define-color sidebar_bg_color {{ primary.container.bg }};
+@define-color sidebar_fg_color {{ primary.container.fg }};
+@define-color sidebar_backdrop_color {{ primary.container.bg }};
+@define-color card_bg_color {{ primary.container.bg }};
+@define-color card_fg_color {{ primary.container.fg }};
+@define-color card_shade_color rgba(0, 0, 0, 0.07);
+@define-color thumbnail_bg_color {{ bg }};
+@define-color thumbnail_fg_color {{ fg }};
+@define-color dialog_bg_color {{ bg }};
+@define-color dialog_fg_color {{ fg }};
+@define-color popover_bg_color {{ primary.container.bg }};
+@define-color popover_fg_color {{ primary.container.fg }};
+@define-color shade_color rgba(0, 0, 0, 0.36);
+@define-color scrollbar_outline_color {{ border }};
+
+.navigation-sidebar {
+    background-color: {{ primary.container.bg }};
+}
+
+switch:checked {
+    background-color: {{ primary.bg }};
+}
+
+switch:checked slider {
+    background-color: {{ primary.fg }};
+}

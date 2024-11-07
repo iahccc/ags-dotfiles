@@ -20,12 +20,12 @@ class ColorPicker extends Service {
         this.changed("colors")
     }
 
-    // TODO: doesn't work?
     async wlCopy(color: string) {
         if (dependencies("wl-copy"))
-            bash(`wl-copy ${color}`)
+            bash(`wl-copy \"${color}\"`)
     }
 
+    // eslint-disable-next-line space-before-function-paren
     readonly pick = async () => {
         if (!dependencies("hyprpicker"))
             return

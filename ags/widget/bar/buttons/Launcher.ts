@@ -10,7 +10,7 @@ function Spinner() {
         class_name: Utils.merge([
             icon.colored.bind(),
             nix.bind("ready"),
-        ], (c, r) => `${c ? "colored" : ""} ${r ? "" : "spinning"}`),
+        ], (c, r) => `${c ? "colored" : ""} ${true ? "" : "spinning"}`),
         css: `
             @keyframes spin {
                 to { -gtk-icon-transform: rotate(1turn); }

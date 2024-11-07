@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { type Opt } from "lib/option"
 import options from "options"
-import { bash, dependencies } from "lib/utils"
+import { bash, dependencies, sh } from "lib/utils"
 
 const deps = [
     "font",
@@ -85,25 +85,28 @@ async function resetCss() {
 
     try {
         const vars = `${TMP}/variables.scss`
-        const scss = `${TMP}/main.scss`
-        const css = `${TMP}/main.css`
-
-        const fd = await bash(`fd ".scss" ${App.configDir}`)
-        const files = fd.split(/\s+/)
-        const imports = [vars, ...files].map(f => `@import '${f}';`)
-
         await Utils.writeFile(variables().join("\n"), vars)
-        await Utils.writeFile(imports.join("\n"), scss)
-        await bash`sass ${scss} ${css}`
 
-        App.applyCss(css, true)
+        const fd = await sh(`fd ".scss" ${App.configDir}`)
+        const files = fd.split(/\s+/).map(f => `@import '${f}';`)
+        const scss = [`@import '${vars}';`, ...files].join("\n")
+        const css = await bash`echo "${scss}" | sass --stdin`
+        const file = `${TMP}/style.css`
+
+        await Utils.writeFile(css, file)
+
+        App.resetCss()
+        App.applyCss(file)
     } catch (error) {
-        error instanceof Error
-            ? logError(error)
-            : console.error(error)
+        logError(error)
     }
 }
 
-Utils.monitorFile(`${App.configDir}/style`, resetCss)
+await sh(`fd "scss" ${App.configDir} -t f`).then(files => {
+    files.split(/\s+/).forEach(file => {
+        Utils.monitorFile(file, resetCss)
+    })
+})
+
 options.handler(deps, resetCss)
 await resetCss()

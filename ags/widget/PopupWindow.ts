@@ -3,6 +3,9 @@ import { type RevealerProps } from "types/widgets/revealer"
 import { type EventBoxProps } from "types/widgets/eventbox"
 import type Gtk from "gi://Gtk?version=3.0"
 import options from "options"
+import {bash} from "lib/utils"
+
+const battery = await Service.import("battery")
 
 type Transition = RevealerProps["transition"]
 type Child = WindowProps["child"]
@@ -29,21 +32,34 @@ const PopupRevealer = (
     name: string,
     child: Child,
     transition: Transition = "slide_down",
-) => Widget.Box(
-    { css: "padding: 1px;" },
-    Widget.Revealer({
-        transition,
-        child: Widget.Box({
-            class_name: "window-content",
-            child,
+) => {
+    return Widget.Box(
+        { css: "padding: 1px;" },
+        Widget.Revealer({
+            transition: transition,
+            child: Widget.Box({
+                class_name: "window-content",
+                child,
+            }),
+            transitionDuration: options.transition.bind(),
+            setup: self => {
+                self.hook(App, (_, wname, visible) => {
+                    if (wname === name)
+                    self.reveal_child = visible
+                })
+                self.hook(battery, self => {
+                    if(options.disableTransitionWhenDischarging.getValue()) {
+                        if(battery.charging || battery.charged) {
+                            self.transitionDuration = options.transition.getValue()
+                        } else {
+                            self.transitionDuration = 0
+                        }
+                    }
+                })
+            },
         }),
-        transitionDuration: options.transition.bind(),
-        setup: self => self.hook(App, (_, wname, visible) => {
-            if (wname === name)
-                self.reveal_child = visible
-        }),
-    }),
-)
+    )
+}
 
 const Layout = (name: string, child: Child, transition?: Transition) => ({
     "center": () => Widget.CenterBox({},
@@ -145,7 +161,11 @@ export default ({
 }: PopupWindowProps) => Widget.Window<Gtk.Widget>({
     name,
     class_names: [name, "popup-window"],
-    setup: w => w.keybind("Escape", () => App.closeWindow(name)),
+    setup: w => w.keybind("Escape", () => {
+            App.closeWindow(name)
+            // 临时修复焦点异常
+            // bash("hyprctl dispatch focuswindow pid:$(hyprctl activewindow | grep -oP 'pid: \\K\\d+')")
+        }),
     visible: false,
     keymode: "on-demand",
     exclusivity,

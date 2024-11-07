@@ -14,6 +14,7 @@ import options from "options"
 
 const { bar, quicksettings } = options
 const media = (await Service.import("mpris")).bind("players")
+
 const layout = Utils.derive([bar.position, quicksettings.position], (bar, qs) =>
     `${bar}-${qs}` as const,
 )
@@ -56,10 +57,10 @@ const Settings = () => Widget.Box({
             [WifiSelection, BluetoothDevices],
         ),
         Row(
-            [ProfileToggle, DarkModeToggle],
-            [ProfileSelector],
+            [DarkModeToggle, MicMute],
+            [],
         ),
-        Row([MicMute, DND]),
+        Row([DND]),
         Widget.Box({
             visible: media.as(l => l.length > 0),
             child: Media(),

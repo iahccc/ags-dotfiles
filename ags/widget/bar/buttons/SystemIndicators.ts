@@ -38,10 +38,10 @@ const ModeIndicator = () => {
 const MicrophoneIndicator = () => Widget.Icon()
     .hook(audio, self => self.visible =
         audio.recorders.length > 0
-        || audio.microphone.is_muted
-        || false)
+        || audio.microphone.stream?.is_muted
+        || audio.microphone.is_muted)
     .hook(audio.microphone, self => {
-        const vol = audio.microphone.is_muted ? 0 : audio.microphone.volume
+        const vol = audio.microphone.stream!.is_muted ? 0 : audio.microphone.volume
         const { muted, low, medium, high } = icons.audio.mic
         const cons = [[67, high], [34, medium], [1, low], [0, muted]] as const
         self.icon = cons.find(([n]) => n <= vol * 100)?.[1] || ""
@@ -63,7 +63,7 @@ const BluetoothIndicator = () => Widget.Overlay({
         hpack: "end",
         vpack: "start",
         label: bluetooth.bind("connected_devices").as(c => `${c.length}`),
-        visible: bluetooth.bind("connected_devices").as(c => c.length > 0),
+        visible: bluetooth.bind("connected_devices").as(c => false && c.length > 0),
     }),
 })
 
@@ -73,13 +73,14 @@ const NetworkIndicator = () => Widget.Icon().hook(network, self => {
     self.visible = !!icon
 })
 
-const AudioIndicator = () => Widget.Icon()
-    .hook(audio.speaker, self => {
-        const vol = audio.speaker.is_muted ? 0 : audio.speaker.volume
+const AudioIndicator = () => Widget.Icon({
+    icon: audio.speaker.bind("volume").as(vol => {
         const { muted, low, medium, high, overamplified } = icons.audio.volume
         const cons = [[101, overamplified], [67, high], [34, medium], [1, low], [0, muted]] as const
-        self.icon = cons.find(([n]) => n <= vol * 100)?.[1] || ""
-    })
+        const icon = cons.find(([n]) => n <= vol * 100)?.[1] || ""
+        return audio.speaker.is_muted ? muted : icon
+    }),
+})
 
 export default () => PanelButton({
     window: "quicksettings",
@@ -87,8 +88,8 @@ export default () => PanelButton({
     on_scroll_up: () => audio.speaker.volume += 0.02,
     on_scroll_down: () => audio.speaker.volume -= 0.02,
     child: Widget.Box([
-        ProfileIndicator(),
-        ModeIndicator(),
+        //ProfileIndicator(),
+        //ModeIndicator(),
         DNDIndicator(),
         BluetoothIndicator(),
         NetworkIndicator(),

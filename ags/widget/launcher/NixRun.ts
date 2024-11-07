@@ -1,4 +1,3 @@
-import icons from "lib/icons"
 import nix, { type Nixpkg } from "service/nix"
 
 const iconVisible = Variable(false)
@@ -60,7 +59,7 @@ function Item(pkg: Nixpkg) {
 
 export function Spinner() {
     const icon = Widget.Icon({
-        icon: icons.nix.nix,
+        icon: "nixos-symbolic",
         class_name: "spinner",
         css: `
             @keyframes spin {

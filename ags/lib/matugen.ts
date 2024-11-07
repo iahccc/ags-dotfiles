@@ -1,9 +1,9 @@
-import wallpaper from "service/wallpaper"
 import options from "options"
 import { sh, dependencies } from "./utils"
 
+
 export default function init() {
-    wallpaper.connect("changed", () => matugen())
+    options.wallpaper.connect("changed", () => matugen())
     options.autotheme.connect("changed", () => matugen())
 }
 
@@ -14,7 +14,7 @@ function animate(...setters: Array<() => void>) {
 
 export async function matugen(
     type: "image" | "color" = "image",
-    arg = wallpaper.wallpaper,
+    arg = options.wallpaper.value,
 ) {
     if (!options.autotheme.value || !dependencies("matugen"))
         return
@@ -49,6 +49,14 @@ export async function matugen(
         () => {
             dark.primary.fg.value = c.dark.on_primary
             light.primary.fg.value = c.light.on_primary
+        },
+        () => {
+            dark.primary.container.bg.value = c.dark.surface_container
+            light.primary.container.bg.value = c.light.surface_container
+        },
+        () => {
+            dark.primary.container.fg.value = c.dark.on_surface
+            light.primary.container.fg.value = c.light.on_surface
         },
         () => {
             dark.error.bg.value = c.dark.error

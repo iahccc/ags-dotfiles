@@ -59,6 +59,7 @@ function Launcher() {
 
     const entry = Widget.Entry({
         hexpand: true,
+        text: AppLauncher.newFavFlag.bind().as(flag => ""),
         primary_icon_name: icons.ui.search,
         on_accept: ({ text }) => {
             if (text?.startsWith(":nx"))
@@ -92,7 +93,7 @@ function Launcher() {
     })
 
     function focus() {
-        entry.text = "Search"
+        entry.text = ""
         entry.set_position(-1)
         entry.select_region(0, -1)
         entry.grab_focus()

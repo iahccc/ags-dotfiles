@@ -94,8 +94,9 @@ type MenuProps = {
     icon: IconProps["icon"]
     title: LabelProps["label"]
     content: Gtk.Widget[]
+    title_button: Gtk.Button
 }
-export const Menu = ({ name, icon, title, content }: MenuProps) => Widget.Revealer({
+export const Menu = ({ name, icon, title, content, title_button}: MenuProps) => Widget.Revealer({
     transition: "slide_down",
     reveal_child: opened.bind().as(v => v === name),
     child: Widget.Box({
@@ -114,13 +115,21 @@ export const Menu = ({ name, icon, title, content }: MenuProps) => Widget.Reveal
                         truncate: "end",
                         label: title,
                     }),
+                    Widget.Box({ hexpand: true }),
+                    title_button,
                 ],
             }),
             Widget.Separator(),
-            Widget.Box({
-                vertical: true,
-                class_name: "content vertical",
-                children: content,
+            Widget.Scrollable({
+                vscroll: 'automatic',
+                hscroll: 'never',
+                max_content_height: 500,
+                propagate_natural_height: true,
+                child: Widget.Box({
+                    vertical: true,
+                    class_name: "content vertical",
+                    children: content,
+                }),
             }),
         ],
     }),

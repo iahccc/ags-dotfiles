@@ -1,5 +1,6 @@
 import PopupWindow from "widget/PopupWindow"
 import powermenu from "service/powermenu"
+import {bash} from "lib/utils"
 
 export default () => PopupWindow({
     name: "verification",
@@ -31,14 +32,17 @@ export default () => PopupWindow({
                     Widget.Button({
                         child: Widget.Label("No"),
                         on_clicked: () => App.toggleWindow("verification"),
+                    }),
+                    Widget.Button({
+                        child: Widget.Label("Yes"),
+                        on_clicked: () => {
+                            App.toggleWindow("verification")
+                            bash(powermenu.cmd)
+                        },
                         setup: self => self.hook(App, (_, name: string, visible: boolean) => {
                             if (name === "verification" && visible)
                                 self.grab_focus()
                         }),
-                    }),
-                    Widget.Button({
-                        child: Widget.Label("Yes"),
-                        on_clicked: () => Utils.exec(powermenu.cmd),
                     }),
                 ],
             }),

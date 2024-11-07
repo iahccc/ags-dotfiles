@@ -2,11 +2,11 @@
 import Row from "./Row"
 import Group from "./Group"
 import Page from "./Page"
-import Wallpaper from "./Wallpaper"
 import options from "options"
 import icons from "lib/icons"
 
 const {
+    wallpaper: wp,
     autotheme: at,
     font,
     theme,
@@ -35,7 +35,7 @@ const {
 export default [
     Page("Theme", icons.ui.themes,
         Group("",
-            Wallpaper() as ReturnType<typeof Row>,
+            Row({ opt: wp, title: "Wallpaper", type: "img" }),
             Row({ opt: at, title: "Auto Generate Color Scheme" }),
             Row({ opt: scheme, title: "Color Scheme", type: "enum", enums: ["dark", "light"] }),
         ),
@@ -44,6 +44,8 @@ export default [
             Row({ opt: dark.fg, title: "Foreground", type: "color" }),
             Row({ opt: dark.primary.bg, title: "Primary", type: "color" }),
             Row({ opt: dark.primary.fg, title: "On Primary", type: "color" }),
+            Row({ opt: dark.primary.container.bg, title: "Container Primary", type: "color" }),
+            Row({ opt: dark.primary.container.fg, title: "Container On Primary", type: "color" }),
             Row({ opt: dark.error.bg, title: "Error", type: "color" }),
             Row({ opt: dark.error.fg, title: "On Error", type: "color" }),
             Row({ opt: dark.widget, title: "Widget", type: "color" }),
@@ -54,6 +56,8 @@ export default [
             Row({ opt: light.fg, title: "Foreground", type: "color" }),
             Row({ opt: light.primary.bg, title: "Primary", type: "color" }),
             Row({ opt: light.primary.fg, title: "On Primary", type: "color" }),
+            Row({ opt: light.primary.container.bg, title: "Container Primary", type: "color" }),
+            Row({ opt: light.primary.container.fg, title: "Container On Primary", type: "color" }),
             Row({ opt: light.error.bg, title: "Error", type: "color" }),
             Row({ opt: light.error.fg, title: "On Error", type: "color" }),
             Row({ opt: light.widget, title: "Widget", type: "color" }),

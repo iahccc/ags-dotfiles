@@ -54,6 +54,11 @@ export function forMonitors(widget: (monitor: number) => Gtk.Window) {
     return range(n, 0).map(widget).flat(1)
 }
 
+export function getMonitors() {
+    const n = Gdk.Display.get_default()?.get_n_monitors() || 1
+    return range(n, 0).flat(1)
+}
+
 /**
  * @returns [start...length]
  */
@@ -65,14 +70,12 @@ export function range(length: number, start = 1) {
  * @returns true if all of the `bins` are found
  */
 export function dependencies(...bins: string[]) {
-    const missing = bins.filter(bin => Utils.exec({
-        cmd: `which ${bin}`,
-        out: () => false,
-        err: () => true,
-    }))
+    const missing = bins.filter(bin => {
+        return !Utils.exec(`which ${bin}`)
+    })
 
     if (missing.length > 0) {
-        console.warn(Error(`missing dependencies: ${missing.join(", ")}`))
+        console.warn("missing dependencies:", missing.join(", "))
         Utils.notify(`missing dependencies: ${missing.join(", ")}`)
     }
 
@@ -87,9 +90,14 @@ export function launchApp(app: Application) {
         .split(/\s+/)
         .filter(str => !str.startsWith("%") && !str.startsWith("@"))
         .join(" ")
+    getFocusedMonitorScale().then(scale => {
+        if(exe.includes("flatpak")) {
+            bash(`flatpak override --env=GDK_SCALE=${scale} --env=QT_AUTO_SCREEN_SCALE_FACTOR=1 --env=QT_SCALE_FACTOR=${scale} --user`)
+        }
+        bash(`QT_AUTO_SCREEN_SCALE_FACTOR=1 && QT_SCALE_FACTOR=${scale} && GDK_SCALE=${scale} && ${exe} &`)
+        app.frequency += 1
+    })
 
-    bash(`${exe} &`)
-    app.frequency += 1
 }
 
 /**
@@ -110,4 +118,27 @@ export function createSurfaceFromWidget(widget: Gtk.Widget) {
     cr.fill()
     widget.draw(cr)
     return surface
+}
+
+/**
+ * debounce
+ */
+export function debounce(fn, delay) {
+    let timer = null;
+    return function(...args) {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
+}
+
+/**
+ * get focused monitor scale
+ */
+export async function getFocusedMonitorScale() {
+    const output = await bash(`hyprctl monitors -j`);
+    const monitors = JSON.parse(output);
+    const focusedMonitor = monitors.find(monitor => monitor.focused === true);
+    return focusedMonitor ? focusedMonitor.scale : 1;
 }

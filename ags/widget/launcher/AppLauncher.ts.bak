@@ -1,0 +1,215 @@
+import { type Application } from "types/service/applications"
+import { launchApp, icon } from "lib/utils"
+import options from "options"
+import icons from "lib/icons"
+import Window from "widget/overview/Window"
+const { Gdk } = imports.gi;
+import { opt } from "lib/option"
+
+const apps = await Service.import("applications")
+const { query } = apps
+const { iconSize, favorites } = options.launcher.apps
+
+export const newFavFlag = opt(false)
+
+let cursorTimeout
+const QuickAppButton = (app: Application) => Widget.Button({
+    hexpand: true,
+    tooltip_text: app.name,
+    on_primary_click: (widget, event) => {
+        // 光标
+        cursorTimeout = setTimeout(() => {
+            const display = Gdk.Display.get_default();
+            const cursor = Gdk.Cursor.new_from_name(display, 'grab');
+            widget.get_window()?.set_cursor(cursor);
+        }, 100)
+    },
+    on_primary_click_release: (widget, event) => {
+        // 光标还原
+        const display = Gdk.Display.get_default();
+        const cursor = Gdk.Cursor.new_from_name(display, 'default');
+        widget.get_window()?.set_cursor(cursor);
+
+        // 最父层BOX
+        let parentBox = widget.get_parent()?.get_parent()
+        let separator = parentBox?.get_children()[0]
+        let separatorHeight = separator.get_allocation().height
+        // 按钮的位置大小信息
+        const allocation = widget.get_allocation()
+        // 计算原按钮位置索引
+        let c1 = Math.floor(allocation.x / allocation.width)
+        let r1 = Math.floor(allocation.y / (allocation.height + separatorHeight))
+        // 当前鼠标相对Button的位置
+        let [res, x, y] = event.get_coords();
+        //计算新Button位置索引
+        let c2 = 0
+        let r2 = Math.floor((allocation.y + y) / (allocation.height + separatorHeight))
+        let favs = favorites.getValue().filter(arr => arr.length > 0)
+        if(r2 >= favs.length) {
+            r2 = favs.length
+            favs.push([])
+        } else if(r2 < 0) {
+            r2 = 0
+            favs.unshift([])
+            r1++
+        } else {
+            // 获取指定行BOX的第一个Button
+            let button = parentBox?.get_children()[r2 * 2 + 1]?.get_children()[0]
+            c2 = Math.floor((allocation.x + x + button.get_allocation().width / 2) / button.get_allocation().width)
+        }
+        // Button位置调整
+        if(favs[r1][c1] !== favs[r2][c2]) {
+            const tmp = favs[r1][c1]
+            if(c2 >= 0 && c2 < favs[r2].length) {
+                favs[r1][c1] = ""
+                favs[r2].splice(c2, 0, tmp)
+            } else {
+                favs[r1][c1] = ""
+                if(c2 < 0) {
+                    favs[r2].unshift(tmp)
+                } else {
+                    favs[r2].push(tmp)
+                }
+            }
+            favs = favs.map(arr => arr.filter(item => item !== ""))
+            favorites.setValue(favs.filter(arr => arr.length > 0))
+        }
+    },
+    on_clicked: (widget) => {
+        // 光标还原
+        clearTimeout(cursorTimeout)
+
+        App.closeWindow("launcher")
+        launchApp(app)
+    },
+    on_middle_click: () => {
+        favorites.setValue(favorites.getValue().map(arr => arr.filter(item => item != app.desktop)).filter(arr => arr.length > 0))
+    },
+    child: Widget.Icon({
+        size: iconSize.bind(),
+        icon: icon(app.icon_name, icons.fallback.executable),
+    }),
+})
+
+const AppItem = (app: Application) => {
+    const title = Widget.Label({
+        class_name: "title",
+        label: app.name,
+        hexpand: true,
+        xalign: 0,
+        vpack: "center",
+        truncate: "end",
+    })
+
+    const description = Widget.Label({
+        class_name: "description",
+        label: app.description || "",
+        hexpand: true,
+        wrap: true,
+        max_width_chars: 30,
+        xalign: 0,
+        justification: "left",
+        vpack: "center",
+    })
+
+    const appicon = Widget.Icon({
+        icon: icon(app.icon_name, icons.fallback.executable),
+        size: iconSize.bind(),
+    })
+
+    const textBox = Widget.Box({
+        vertical: true,
+        vpack: "center",
+        children: app.description ? [title, description] : [title],
+    })
+
+    return Widget.Button({
+        class_name: "app-item",
+        attribute: { app },
+        child: Widget.Box({
+            children: [appicon, textBox],
+        }),
+        on_clicked: () => {
+            App.closeWindow("launcher")
+            launchApp(app)
+        },
+        on_middle_click: (widget, event) => {
+            let favs = favorites.getValue()
+            favs[favs.length - 1].push(app.desktop)
+            favorites.setValue(favs)
+            newFavFlag.setValue(true)
+        }
+    })
+}
+export function Favorites() {
+    const favs = options.launcher.apps.favorites.bind()
+    return Widget.Revealer({
+        visible: favs.as(f => f.length > 0),
+        reveal_child: newFavFlag.bind(),
+        child: Widget.Box({
+            vertical: true,
+            children: favs.as(favs => favs.flatMap(fs => [
+                Widget.Separator(),
+                Widget.Box({
+                    class_name: "quicklaunch horizontal",
+                    homogeneous: true,
+                    children: fs
+                        .map(f => {
+                            let app = query(f)?.[0]
+                            if(app === undefined) {
+                                favorites.setValue(favorites.getValue().map(arr => arr.filter(item => item != f)))
+                            }
+                            return app
+                        })
+                        .filter(f => f)
+                        .map(QuickAppButton),
+                }),
+            ])),
+        }),
+    })
+}
+
+export function Launcher() {
+    const applist = Variable(query(""))
+    const max = options.launcher.apps.max
+    let first = applist.value[0]
+
+    function SeparatedAppItem(app: Application) {
+        return Widget.Revealer(
+            { attribute: { app } },
+            Widget.Box(
+                { vertical: true },
+                Widget.Separator(),
+                AppItem(app),
+            ),
+        )
+    }
+
+    const list = Widget.Box({
+        vertical: true,
+        children: applist.bind().as(list => list.map(SeparatedAppItem)),
+        setup: self => self
+            .hook(apps, () => applist.value = query(""), "changed"),
+    })
+
+    return Object.assign(list, {
+        filter(text: string | null) {
+            first = query(text || "")[0]
+            list.children.reduce((i, item) => {
+                if (!text || i >= max.value) {
+                    item.reveal_child = false
+                    return i
+                }
+                if (item.attribute.app.match(text)) {
+                    item.reveal_child = true
+                    return ++i
+                }
+                item.reveal_child = false
+                return i
+            }, 0)
+        },
+        launchFirst() {
+            launchApp(first)
+        },
+    })
+}

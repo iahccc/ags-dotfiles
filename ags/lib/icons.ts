@@ -15,18 +15,19 @@ export const substitutes = {
 export default {
     missing: "image-missing-symbolic",
     nix: {
-        nix: "nix-snowflake-symbolic",
+        nix: "nixos-symbolic",
     },
     app: {
         terminal: "terminal-symbolic",
     },
     fallback: {
-        executable: "application-x-executable",
+        executable: "application-x-executable-symbolic",
         notification: "dialog-information-symbolic",
         video: "video-x-generic-symbolic",
         audio: "audio-x-generic-symbolic",
     },
     ui: {
+        starter: "start-here-symbolic",
         close: "window-close-symbolic",
         colorpicker: "color-select-symbolic",
         info: "info-symbolic",
@@ -100,6 +101,7 @@ export default {
         screen: "display-brightness-symbolic",
     },
     powermenu: {
+        lock: "system-lock-screen-symbolic",
         sleep: "weather-clear-night-symbolic",
         reboot: "system-reboot-symbolic",
         logout: "system-log-out-symbolic",
@@ -107,6 +109,9 @@ export default {
     },
     recorder: {
         recording: "media-record-symbolic",
+    },
+    message: {
+        indicator: "message-indicator-symbolic"
     },
     notifications: {
         noisy: "org.gnome.Settings-notifications-symbolic",

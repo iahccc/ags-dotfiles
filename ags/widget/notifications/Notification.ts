@@ -88,7 +88,7 @@ export default (notification: Notification) => {
                         use_markup: true,
                         xalign: 0,
                         justification: "left",
-                        label: notification.body.trim(),
+                        label: notification.body.toString().trim(),
                         max_width_chars: 24,
                         wrap: true,
                     }),

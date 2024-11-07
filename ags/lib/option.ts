@@ -1,4 +1,5 @@
 import { Variable } from "resource:///com/github/Aylur/ags/variable.js"
+import { debounce } from "./utils"
 
 type OptProps = {
     persistent?: boolean
@@ -105,9 +106,10 @@ export function mkOptions<T extends object>(cacheFile: string, object: T) {
             return (await reset()).join("\n")
         },
         handler(deps: string[], callback: () => void) {
+            const ncallback = debounce(callback, 100)
             for (const opt of getOptions(object)) {
                 if (deps.some(i => opt.id.startsWith(i)))
-                    opt.connect("changed", callback)
+                    opt.connect("changed", ncallback)
             }
         },
     })

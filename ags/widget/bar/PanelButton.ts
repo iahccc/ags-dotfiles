@@ -23,6 +23,7 @@ export default ({
         self.hook(options.bar.flatButtons, () => {
             self.toggleClassName("flat", flat ?? options.bar.flatButtons.value)
         })
+        self.toggleClassName("flat", flat ?? options.bar.flatButtons.value)
 
         self.hook(App, (_, win, visible) => {
             if (win !== window)
