@@ -18,6 +18,10 @@ const AsusProfileSelector = () => Menu({
     name: "asusctl-profile",
     icon: asusprof.as(p => icons.asusctl.profile[p]),
     title: "Profile Selector",
+    title_button: Widget.Button({
+        child: Widget.Icon({ icon: icons.ui.settings }),
+        onClicked: () => {},
+    }),
     content: [
         Widget.Box({
             vertical: true,
@@ -74,6 +78,10 @@ const PowerProfileSelector = () => Menu({
     name: "asusctl-profile",
     icon: profile.as(p => icons.powerprofile[p]),
     title: "Profile Selector",
+    title_button: Widget.Button({
+        child: Widget.Icon({ icon: icons.ui.settings }),
+        onClicked: () => {},
+    }),
     content: [Widget.Box({
         vertical: true,
         hexpand: true,

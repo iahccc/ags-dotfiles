@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   nerdfonts = pkgs.nerdfonts.override {
     fonts = [
       "Ubuntu"
@@ -17,6 +21,7 @@
   font = {
     name = "Ubuntu Nerd Font";
     package = nerdfonts;
+    size = 11;
   };
   cursorTheme = {
     name = "Qogir";
@@ -36,7 +41,7 @@ in {
       font.package
       cursorTheme.package
       iconTheme.package
-      gnome.adwaita-icon-theme
+      adwaita-icon-theme
       papirus-icon-theme
     ];
     sessionVariables = {
@@ -49,9 +54,6 @@ in {
         gtk.enable = true;
       };
     file = {
-      ".local/share/themes/${theme.name}" = {
-        source = "${theme.package}/share/themes/${theme.name}";
-      };
       ".config/gtk-4.0/gtk.css".text = ''
         window.messagedialog .response-area > button,
         window.dialog.message .dialog-action-area > button,
@@ -78,6 +80,18 @@ in {
 
   qt = {
     enable = true;
-    platformTheme = "kde";
+    platformTheme.name = "kde";
   };
+
+  home.file.".local/share/flatpak/overrides/global".text = let
+    dirs = [
+      "/nix/store:ro"
+      "xdg-config/gtk-3.0:ro"
+      "xdg-config/gtk-4.0:ro"
+      "${config.xdg.dataHome}/icons:ro"
+    ];
+  in ''
+    [Context]
+    filesystems=${builtins.concatStringsSep ";" dirs}
+  '';
 }

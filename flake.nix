@@ -4,94 +4,42 @@
   outputs = inputs @ {
     self,
     home-manager,
-    nix-darwin,
     nixpkgs,
     ...
   }: {
-    formatter = {
-      x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
-      x86_64-darwin = nixpkgs.legacyPackages.x86_64-darwin.alejandra;
-    };
-
     packages.x86_64-linux.default =
       nixpkgs.legacyPackages.x86_64-linux.callPackage ./ags {inherit inputs;};
 
     # nixos config
     nixosConfigurations = {
-      "nixos" = let
-        hostname = "nixos";
-        username = "demeter";
-      in
-        nixpkgs.lib.nixosSystem rec {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            asztal = self.packages.x86_64-linux.default;
-          };
-          modules = [
-            ./nixos/nixos.nix
-            home-manager.nixosModules.home-manager
-            {
-              users.users.${username} = {
-                isNormalUser = true;
-                initialPassword = username;
-                extraGroups = [
-                  "nixosvmtest"
-                  "networkmanager"
-                  "wheel"
-                  "audio"
-                  "video"
-                  "libvirtd"
-                  "docker"
-                ];
-              };
-              networking.hostName = hostname;
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = specialArgs;
-                users.${username} = {
-                  home.username = username;
-                  home.homeDirectory = "/home/${username}";
-                  imports = [./nixos/home.nix];
-                };
-              };
-            }
-          ];
+      "nixos" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+          asztal = self.packages.x86_64-linux.default;
         };
+        modules = [
+          ./nixos/nixos.nix
+          home-manager.nixosModules.home-manager
+          {networking.hostName = "nixos";}
+        ];
+      };
     };
 
-    # macos
-    darwinConfigurations = {
-      "macos" = let
-        username = "demeter";
-      in
-        nix-darwin.lib.darwinSystem {
-          modules = [
-            ./macos/macos.nix
-            home-manager.darwinModules.home-manager
-            {
-              users.users.${username} = {
-                name = username;
-                home = "/Users/${username}";
-              };
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = {inherit inputs;};
-                users."${username}" = {
-                  home.username = username;
-                  home.homeDirectory = "/Users/${username}";
-                  imports = [./macos/home.nix];
-                };
-              };
-              networking = {
-                hostName = "macos";
-                computerName = "macos";
-              };
-            }
-          ];
-        };
+    # macos hm config
+    homeConfigurations = {
+      "demeter" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-darwin;
+        extraSpecialArgs = {inherit inputs;};
+        modules = [
+          ({pkgs, ...}: {
+            nix.package = pkgs.nix;
+            home.username = "demeter";
+            home.homeDirectory = "/Users/demeter";
+            imports = [./macos/home.nix];
+          })
+        ];
+      };
     };
   };
 
@@ -103,26 +51,27 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-darwin = {
-      url = "github:LnL7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
 
-    hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
 
-    matugen.url = "github:InioX/matugen";
+    hyprland-hyprspace = {
+      url = "github:KZDKM/Hyprspace";
+      inputs.hyprland.follows = "hyprland";
+    };
+
+    matugen.url = "github:InioX/matugen?ref=v2.2.0";
     ags.url = "github:Aylur/ags";
     astal.url = "github:Aylur/astal";
-    stm.url = "github:Aylur/stm";
 
     lf-icons = {
       url = "github:gokcehan/lf";
       flake = false;
     };
+
     firefox-gnome-theme = {
       url = "github:rafaelmardojai/firefox-gnome-theme";
       flake = false;

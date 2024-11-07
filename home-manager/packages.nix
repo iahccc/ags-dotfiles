@@ -1,58 +1,31 @@
 {pkgs, ...}: {
   imports = [
+    ./modules/packages.nix
     ./scripts/blocks.nix
     ./scripts/nx-switch.nix
     ./scripts/vault.nix
   ];
 
-  xdg.desktopEntries = {
-    "lf" = {
-      name = "lf";
-      noDisplay = true;
-    };
+  packages = with pkgs; {
+    linux = [
+      (mpv.override {scripts = [mpvScripts.mpris];})
+      spotify
+      # gnome-secrets
+      fragments
+      figma-linux
+      # yabridge
+      # yabridgectl
+      # wine-staging
+      nodejs
+    ];
+    cli = [
+      bat
+      eza
+      fd
+      ripgrep
+      fzf
+      lazydocker
+      lazygit
+    ];
   };
-
-  home.packages = with pkgs; with gnome; [
-    # gui
-    obsidian
-    (mpv.override {scripts = [mpvScripts.mpris];})
-    libreoffice
-    spotify
-    caprine-bin
-    d-spy
-    github-desktop
-    gimp
-    transmission_4-gtk
-    discord
-    teams-for-linux
-    icon-library
-    dconf-editor
-    gnome-secrets
-
-    # langs
-    poetry
-    nodejs
-    yarn
-    go
-
-    # tools
-    steam-run # fhs envs
-    bat
-    eza
-    fd
-    ripgrep
-    fzf
-    libnotify
-    killall
-    zip
-    unzip
-    glib
-
-    # fun
-    glow
-    slides
-    yabridge
-    yabridgectl
-    wine-staging
-  ];
 }

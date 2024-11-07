@@ -109,7 +109,6 @@ with lib.hm.gvariant; {
         "org.gnome.Nautilus.desktop"
         "org.gnome.Calendar.desktop"
         "obsidian.desktop"
-        "transmission-gtk.desktop"
         "caprine.desktop"
         "teams-for-linux.desktop"
         "discord.desktop"
@@ -123,16 +122,8 @@ with lib.hm.gvariant; {
       current-workspace-only = false;
     };
 
-    "org/gnome/shell/keybindings" = {
-      toggle-application-view = ["<Super>r"];
-    };
-
     "system/locale" = {
       region = "hu_HU.UTF-8";
-    };
-
-    "com/github/stunkymonkey/nautilus-open-any-terminal" = {
-      terminal = "wezterm";
     };
 
     "org/virt-manager/virt-manager/connections" = {

@@ -41,7 +41,7 @@ export const Volume = () => Widget.Box({
     ],
 })
 
-export const Microhone = () => Widget.Box({
+export const Microphone = () => Widget.Box({
     class_name: "slider horizontal",
     visible: audio.bind("recorders").as(a => a.length > 0),
     children: [

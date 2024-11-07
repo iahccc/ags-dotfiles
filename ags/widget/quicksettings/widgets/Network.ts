@@ -31,7 +31,7 @@ export const WifiSelection = () => Menu({
                 wifi.access_points.map(ap => Widget.Button({
                     on_clicked: () => {
                         if (dependencies("nmcli"))
-                        Utils.execAsync(`nmcli device wifi connect ${ap.bssid}`)
+                            Utils.execAsync(`nmcli device wifi connect ${ap.bssid}`)
                     },
                     child: Widget.Box({
                         children: [
@@ -43,7 +43,7 @@ export const WifiSelection = () => Menu({
                                 hpack: "end",
                                 setup: self => Utils.idle(() => {
                                     if (!self.is_destroyed)
-                                    self.visible = ap.active
+                                        self.visible = ap.active
                                 }),
                             }),
                         ],

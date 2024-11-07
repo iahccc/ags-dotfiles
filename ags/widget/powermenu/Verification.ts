@@ -35,10 +35,7 @@ export default () => PopupWindow({
                     }),
                     Widget.Button({
                         child: Widget.Label("Yes"),
-                        on_clicked: () => {
-                            App.toggleWindow("verification")
-                            bash(powermenu.cmd)
-                        },
+                        on_clicked: powermenu.exec,
                         setup: self => self.hook(App, (_, name: string, visible: boolean) => {
                             if (name === "verification" && visible)
                                 self.grab_focus()

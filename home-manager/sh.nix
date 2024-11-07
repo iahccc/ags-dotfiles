@@ -1,9 +1,10 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: let
-  shellAliases = {
+  aliases = {
     "db" = "distrobox";
     "tree" = "eza --tree";
     "nv" = "nvim";
@@ -26,9 +27,14 @@
     "del" = "gio trash";
   };
 in {
-  programs = {
+  options.shellAliases = with lib; mkOption {
+    type = types.attrsOf types.str;
+    default = {};
+  };
+
+  config.programs = {
     zsh = {
-      inherit shellAliases;
+      shellAliases = aliases // config.shellAliases;
       enable = true;
       enableCompletion = true;
       autosuggestion.enable = true;
@@ -43,13 +49,13 @@ in {
     };
 
     bash = {
-      inherit shellAliases;
+      shellAliases = aliases // config.shellAliases;
       enable = true;
       initExtra = "SHELL=${pkgs.bash}";
     };
 
     nushell = {
-      inherit shellAliases;
+      shellAliases = aliases // config.shellAliases;
       enable = true;
       environmentVariables = {
         PROMPT_INDICATOR_VI_INSERT = "\"  \"";
@@ -66,7 +72,6 @@ in {
         conf = builtins.toJSON {
           show_banner = false;
           edit_mode = "vi";
-          shell_integration = true;
 
           ls.clickable_links = true;
           rm.always_trash = true;
@@ -104,13 +109,18 @@ in {
           completion = name: ''
             source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/${name}/${name}-completions.nu
           '';
-        in names:
-          builtins.foldl'
-          (prev: str: "${prev}\n${str}") ""
-          (map (name: completion name) names);
+        in
+          names:
+            builtins.foldl'
+            (prev: str: "${prev}\n${str}") ""
+            (map (name: completion name) names);
       in ''
         $env.config = ${conf};
-        ${completions ["cargo" "git" "nix" "npm"]}
+        ${completions ["cargo" "git" "nix" "npm" "poetry" "curl"]}
+
+        alias pueue = ${pkgs.pueue}/bin/pueue
+        alias pueued = ${pkgs.pueue}/bin/pueued
+        use ${pkgs.nu_scripts}/share/nu_scripts/modules/background_task/task.nu
       '';
     };
   };

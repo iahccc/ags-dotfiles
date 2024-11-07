@@ -1,5 +1,4 @@
 let
-  email = "demstof@gmail.com";
   name = "Aylur";
 in {
   programs.git = {
@@ -11,7 +10,12 @@ in {
       github.user = name;
       push.autoSetupRemote = true;
     };
-    userEmail = email;
+    userEmail = "k.demeter@protonmail.com";
     userName = name;
   };
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
+  };
+  services.ssh-agent.enable = true;
 }

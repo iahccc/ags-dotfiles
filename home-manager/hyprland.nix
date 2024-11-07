@@ -4,7 +4,7 @@
   ...
 }: let
   hyprland = inputs.hyprland.packages.${pkgs.system}.hyprland;
-  plugins = inputs.hyprland-plugins.packages.${pkgs.system};
+  # plugins = inputs.hyprland-plugins.packages.${pkgs.system};
 
   yt = pkgs.writeShellScript "yt" ''
     notify-send "Opening video" "$(wl-paste)"
@@ -14,6 +14,7 @@
   playerctl = "${pkgs.playerctl}/bin/playerctl";
   brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
   pactl = "${pkgs.pulseaudio}/bin/pactl";
+  screenshot = import ./scripts/screenshot.nix pkgs;
 in {
   xdg.desktopEntries."org.gnome.Settings" = {
     name = "Settings";
@@ -29,17 +30,18 @@ in {
     package = hyprland;
     systemd.enable = true;
     xwayland.enable = true;
-    # plugins = with plugins; [
-    #   hyprexpo
-    #   hyprbars
-    #   borderspp
-    # ];
+    plugins = [
+      # inputs.hyprland-hyprspace.packages.${pkgs.system}.default
+      # plugins.hyprexpo
+      # plugins.hyprbars
+      # plugins.borderspp
+    ];
 
     settings = {
       exec-once = [
         "ags -b hypr"
         "hyprctl setcursor Qogir 24"
-        "transmission-gtk"
+        "fragments"
       ];
 
       monitor = [
@@ -51,7 +53,6 @@ in {
       general = {
         layout = "dwindle";
         resize_on_border = true;
-        no_cursor_warps = true;
       };
 
       misc = {
@@ -60,7 +61,7 @@ in {
       };
 
       input = {
-        kb_layout = "hu";
+        kb_layout = "hu,us";
         follow_mouse = 1;
         touchpad = {
           natural_scroll = "yes";
@@ -83,8 +84,7 @@ in {
 
       gestures = {
         workspace_swipe = true;
-        workspace_swipe_forever = true;
-        workspace_swipe_numbered = true;
+        workspace_swipe_use_r = true;
       };
 
       windowrule = let
@@ -100,7 +100,7 @@ in {
         (f "Color Picker")
         (f "xdg-desktop-portal")
         (f "xdg-desktop-portal-gnome")
-        (f "transmission-gtk")
+        (f "de.haeckerfelix.Fragments")
         (f "com.github.Aylur.ags")
         "workspace 7, title:Spotify"
       ];
@@ -113,7 +113,7 @@ in {
         mvactive = binding "SUPER ALT" "moveactive";
         mvtows = binding "SUPER SHIFT" "movetoworkspace";
         e = "exec, ags -b hypr";
-        arr = [1 2 3 4 5 6 7 8 9];
+        arr = [1 2 3 4 5 6 7];
       in
         [
           "CTRL SHIFT, R,  ${e} quit; ags -b hypr"
@@ -121,8 +121,8 @@ in {
           "SUPER, Tab,     ${e} -t overview"
           ",XF86PowerOff,  ${e} -r 'powermenu.shutdown()'"
           ",XF86Launch4,   ${e} -r 'recorder.start()'"
-          ",Print,         ${e} -r 'recorder.screenshot()'"
-          "SHIFT,Print,    ${e} -r 'recorder.screenshot(true)'"
+          ",Print,         exec, ${screenshot}"
+          "SHIFT,Print,    exec, ${screenshot} --full"
           "SUPER, Return, exec, xterm" # xterm is a symlink, not actually xterm
           "SUPER, W, exec, firefox"
           "SUPER, E, exec, wezterm -e lf"
@@ -137,8 +137,6 @@ in {
           "SUPER, G, fullscreen"
           "SUPER, O, fakefullscreen"
           "SUPER, P, togglesplit"
-
-          "SUPER, space, hyprexpo:expo, toggle"
 
           (mvfocus "k" "u")
           (mvfocus "j" "d")
@@ -216,14 +214,15 @@ in {
       };
 
       plugin = {
-        hyprexpo = {
-          columns = 3;
-          gap_size = 5;
-          bg_col = "rgb(232323)";
-          workspace_method = "center current";
-          enable_gesture = true;
-          gesture_distance = 300;
-          gesture_positive = false;
+        overview = {
+          centerAligned = true;
+          hideTopLayers = true;
+          hideOverlayLayers = true;
+          showNewWorkspace = true;
+          exitOnClick = true;
+          exitOnSwitch = true;
+          drawActiveWorkspace = true;
+          reverseSwipe = true;
         };
         hyprbars = {
           bar_color = "rgb(2a2a2a)";

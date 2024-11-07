@@ -1,12 +1,21 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }: {
+  xdg.desktopEntries = lib.mkIf pkgs.stdenv.isLinux {
+    "lf" = {
+      name = "lf";
+      noDisplay = true;
+    };
+  };
+
   home.packages = with pkgs; [
     glib
     fzf
     bat
+    zip
     unzip
     gnutar
   ];
