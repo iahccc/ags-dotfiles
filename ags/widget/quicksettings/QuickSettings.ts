@@ -57,10 +57,10 @@ const Settings = () => Widget.Box({
             [WifiSelection, BluetoothDevices],
         ),
         Row(
-            [DarkModeToggle, MicMute],
-            [],
+            [ProfileToggle, DarkModeToggle],
+            [ProfileSelector],
         ),
-        Row([DND]),
+        Row([DND, MicMute]),
         Widget.Box({
             visible: media.as(l => l.length > 0),
             child: Media(),

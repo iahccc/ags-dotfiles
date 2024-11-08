@@ -71,7 +71,7 @@ export function range(length: number, start = 1) {
  */
 export function dependencies(...bins: string[]) {
     const missing = bins.filter(bin => {
-        return !Utils.exec(`which ${bin}`)
+        return Utils.exec(`which ${bin}`).startsWith("which: no")
     })
 
     if (missing.length > 0) {

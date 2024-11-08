@@ -76,7 +76,7 @@ export default {
         "power-saver": "power-profile-power-saver-symbolic",
         performance: "power-profile-performance-symbolic",
     },
-    asusctl: {
+    powerctl: {
         profile: {
             Balanced: "power-profile-balanced-symbolic",
             Quiet: "power-profile-power-saver-symbolic",
