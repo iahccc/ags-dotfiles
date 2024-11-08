@@ -34,7 +34,6 @@ async function genCss() {
         })
         .then((file) => {
             gtk()
-            console.log('CSS file generated successfully at:', file.get_path());
         })
         .catch((err) => {
             console.error('Error:', err);

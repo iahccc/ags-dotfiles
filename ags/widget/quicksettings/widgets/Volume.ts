@@ -10,8 +10,14 @@ const VolumeIndicator = (type: Type = "speaker") => Widget.Button({
     vpack: "center",
     on_clicked: () => audio[type].is_muted = !audio[type].is_muted,
     child: Widget.Icon({
-        icon: audio[type].bind("icon_name")
-            .as(i => icon(i || "", icons.audio.mic.high)),
+        icon: audio[type].bind("is-muted")
+        .as(muted => {
+            if(muted) {
+                return type === "speaker" ? icons.audio.volume.muted : icons.audio.mic.muted
+            } else {
+                return type === "speaker" ? icons.audio.volume.high : icons.audio.mic.high
+            }
+        }),
         tooltipText: audio[type].bind("volume")
             .as(vol => `Volume: ${Math.floor(vol * 100)}%`),
     }),
@@ -42,8 +48,10 @@ export const Volume = () => Widget.Box({
 })
 
 export const Microphone = () => Widget.Box({
-    class_name: "slider horizontal",
-    visible: audio.bind("recorders").as(a => a.length > 0),
+    class_name: "volume",
+    visible: audio.recorders.length > 0
+        || audio.microphone.stream?.is_muted
+        || audio.microphone.is_muted,
     children: [
         VolumeIndicator("microphone"),
         VolumeSlider("microphone"),
@@ -118,6 +126,7 @@ export const AppMixer = () => Menu({
     name: "app-mixer",
     icon: icons.audio.mixer,
     title: "App Mixer",
+    title_button: null,
     content: [
         Widget.Box({
             vertical: true,
@@ -133,6 +142,7 @@ export const SinkSelector = () => Menu({
     name: "sink-selector",
     icon: icons.audio.type.headset,
     title: "Sink Selector",
+    title_button: null,
     content: [
         Widget.Box({
             vertical: true,

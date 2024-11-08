@@ -11,7 +11,7 @@ const pretty = (str: string) => str
     .join(" ")
 
 export const ProfileToggle = () => ArrowToggleButton({
-    name: "asusctl-profile",
+    name: "power-profile",
     icon: profile.as(p => icons.powerprofile[p]),
     label: profile.as(pretty),
     connection: [pp, () => pp.active_profile !== profiles[1]],
@@ -21,7 +21,7 @@ export const ProfileToggle = () => ArrowToggleButton({
 })
 
 export const ProfileSelector = () => Menu({
-    name: "asusctl-profile",
+    name: "power-profile",
     icon: profile.as(p => icons.powerprofile[p]),
     title: "Profile Selector",
     title_button: Widget.Button({

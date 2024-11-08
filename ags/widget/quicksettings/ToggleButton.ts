@@ -94,7 +94,7 @@ type MenuProps = {
     icon: IconProps["icon"]
     title: LabelProps["label"]
     content: Gtk.Widget[]
-    title_button: Gtk.Button
+    title_button: Gtk.Button | null
 }
 export const Menu = ({ name, icon, title, content, title_button}: MenuProps) => Widget.Revealer({
     transition: "slide_down",
@@ -116,7 +116,7 @@ export const Menu = ({ name, icon, title, content, title_button}: MenuProps) => 
                         label: title,
                     }),
                     Widget.Box({ hexpand: true }),
-                    title_button,
+                    ...title_button != null ? [title_button] : [],
                 ],
             }),
             Widget.Separator(),
