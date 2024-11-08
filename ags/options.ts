@@ -57,7 +57,7 @@ const options = mkOptions(OPTIONS, {
 
         shadows: opt(true),
         padding: opt(7),
-        spacing: opt(12),
+        spacing: opt(10),
         radius: opt(11),
     },
 
@@ -72,7 +72,7 @@ const options = mkOptions(OPTIONS, {
     bar: {
         flatButtons: opt(true),
         position: opt<"top" | "bottom">("top"),
-        corners: opt(50),
+        corners: opt(0),
         transparent: opt(false),
         layout: {
             start: opt<BarWidget[]>([
@@ -133,8 +133,8 @@ const options = mkOptions(OPTIONS, {
         },
         taskbar: {
             iconSize: opt(0),
-            monochrome: opt(true),
-            exclusive: opt(false),
+            monochrome: opt(false),
+            exclusive: opt(true),
         },
         messages: {
             action: opt(() => App.toggleWindow("datemenu")),
@@ -186,7 +186,7 @@ const options = mkOptions(OPTIONS, {
     overview: {
         scale: opt(9),
         workspaces: opt(7),
-        monochromeIcon: opt(true),
+        monochromeIcon: opt(false),
     },
 
     powermenu: {
@@ -242,7 +242,7 @@ const options = mkOptions(OPTIONS, {
     hyprland: {
         gaps: opt(2.4),
         inactiveBorder: opt("#282828"),
-        gapsWhenOnly: opt(true),
+        gapsWhenOnly: opt(false),
     },
 })
 
