@@ -26,7 +26,7 @@ const DummyItem = (address: string) => Widget.Box({
     visible: false,
 })
 
-const AppItem = (address: string) => {
+const AppItem = (address: string, monitor: number) => {
     const client = hyprland.getClient(address)
     if (!client || client.class === "")
         return DummyItem(address)
@@ -55,12 +55,12 @@ const AppItem = (address: string) => {
             attribute: { address },
             visible: Utils.watch(true, [exclusive], () => {
                 return exclusive.value
-                    ? hyprland.active.workspace.id === client.workspace.id && hyprland.active.monitor.id === client.monitor
+                    ? hyprland.active.workspace.id === client.workspace.id && monitor === client.monitor
                     : true
             }),
             setup: w => w.hook(hyprland, () => {
                 w.visible = exclusive.value
-                    ? hyprland.active.workspace.id === client.workspace.id && hyprland.active.monitor.id === client.monitor
+                    ? hyprland.active.workspace.id === client.workspace.id && monitor === client.monitor
                     : true
             }),
         },
@@ -87,9 +87,9 @@ function sortItems<T extends { attribute: { address: string } }>(arr: T[]) {
     })
 }
 
-export default () => Widget.Box({
+export default (monitor: number) => Widget.Box({
     class_name: "taskbar",
-    children: sortItems(hyprland.clients.map(c => AppItem(c.address))),
+    children: sortItems(hyprland.clients.map(c => AppItem(c.address, monitor))),
     setup: w => w
         .hook(hyprland, (w, address?: string) => {
             if (typeof address === "string")
@@ -97,7 +97,7 @@ export default () => Widget.Box({
         }, "client-removed")
         .hook(hyprland, (w, address?: string) => {
             if (typeof address === "string")
-                w.children = sortItems([...w.children, AppItem(address)])
+                w.children = sortItems([...w.children, AppItem(address, monitor)])
         }, "client-added")
         .hook(hyprland, (w, event?: string) => {
             if (event === "movewindow")
