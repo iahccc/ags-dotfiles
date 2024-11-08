@@ -53,15 +53,14 @@ const AppItem = (address: string) => {
     return Widget.Box(
         {
             attribute: { address },
-            visible: Utils.watch(true, [exclusive, hyprland], () => {
+            visible: Utils.watch(true, [exclusive], () => {
                 return exclusive.value
-                    ? hyprland.active.workspace.id === client.workspace.id
+                    ? hyprland.active.workspace.id === client.workspace.id && hyprland.active.monitor.id === client.monitor
                     : true
             }),
             setup: w => w.hook(hyprland, () => {
-                const client = hyprland.getClient(address)
                 w.visible = exclusive.value
-                    ? hyprland.active.workspace.id === client.workspace.id
+                    ? hyprland.active.workspace.id === client.workspace.id && hyprland.active.monitor.id === client.monitor
                     : true
             }),
         },
