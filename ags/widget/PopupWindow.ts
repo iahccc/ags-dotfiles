@@ -50,9 +50,9 @@ const PopupRevealer = (
                 self.hook(battery, self => {
                     if(options.disableTransitionWhenDischarging.getValue()) {
                         if(battery.charging || battery.charged) {
-                            self.transitionDuration = options.transition.getValue()
+                            self.transition_duration = options.transition.getValue()
                         } else {
-                            self.transitionDuration = 0
+                            self.transition_duration = 0
                         }
                     }
                 })
