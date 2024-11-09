@@ -58,7 +58,7 @@ const options = mkOptions(OPTIONS, {
         shadows: opt(true),
         padding: opt(7),
         spacing: opt(10),
-        radius: opt(11),
+        radius: opt(10),
     },
 
     transition: opt(200),
@@ -242,7 +242,6 @@ const options = mkOptions(OPTIONS, {
     hyprland: {
         gaps: opt(2.4),
         inactiveBorder: opt("#282828"),
-        gapsWhenOnly: opt(false),
     },
 })
 
