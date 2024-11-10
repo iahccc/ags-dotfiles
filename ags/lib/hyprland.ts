@@ -61,6 +61,8 @@ async function setupHyprland() {
         `general:border_size ${width}`,
         `general:col.active_border ${rgba(primary())}`,
         `general:col.inactive_border ${rgba(hyprland.inactiveBorder.value)}`,
+        `group:groupbar:col.active ${rgba(primary())}`,
+        `group:groupbar:col.inactive ${rgba(hyprland.inactiveBorder.value)}`,
         `decoration:rounding ${radius}`,
         `decoration:shadow:enabled ${shadows.value ? "true" : "false"}`,
     ])
