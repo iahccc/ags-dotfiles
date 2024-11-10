@@ -1,6 +1,6 @@
 import { type Client } from "types/service/hyprland"
 import { createSurfaceFromWidget, icon } from "lib/utils"
-import { matchApp } from "lib/agsutil"
+import { searchOneApp } from "lib/agsutil"
 import Gdk from "gi://Gdk"
 import Gtk from "gi://Gtk?version=3.0"
 import options from "options"
@@ -22,9 +22,7 @@ export default ({ address, size: [w, h], class: c, title }: Client) => Widget.Bu
             min-height: ${(v / 100) * h}px;
         `),
         icon: monochrome.bind().as(m => {
-            let app = apps.list.find(app => app.wm_class?.toLowerCase() == c.toLowerCase())
-            app = app || apps.list.filter(app => matchApp(app, c))?.[0]
-
+            let app = searchOneApp(apps.list, c)
             if (!app)
                 return icons.fallback.executable
 

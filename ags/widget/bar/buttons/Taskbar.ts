@@ -1,5 +1,5 @@
 import { launchApp, icon } from "lib/utils"
-import { matchApp } from "lib/agsutil"
+import { searchOneApp } from "lib/agsutil"
 import icons from "lib/icons"
 import options from "options"
 import PanelButton from "../PanelButton"
@@ -31,8 +31,7 @@ const AppItem = (address: string, monitor: number) => {
     if (!client || client.class === "")
         return DummyItem(address)
 
-    let app = apps.list.find(app => app.wm_class?.toLowerCase() == client.class.toLowerCase())
-    app = app || apps.list.filter(app => matchApp(app, client.class))?.[0]
+    let app = searchOneApp(apps.list, client.class)
 
     const btn = PanelButton({
         class_name: "panel-button",
@@ -99,8 +98,11 @@ export default (monitor: number) => Widget.Box({
             if (typeof address === "string")
                 w.children = sortItems([...w.children, AppItem(address, monitor)])
         }, "client-added")
-        .hook(hyprland, (w, event?: string) => {
-            if (event === "movewindow")
-                w.children = sortItems(w.children)
+        .hook(hyprland, (w, event: string, data: string) => {
+            if (event === "movewindow") {
+                let address = '0x' + data.split(",")[0]
+                let children = w.children.filter(ch => ch.attribute.address !== address)
+                w.children = sortItems([...children, AppItem(address, monitor)])
+            }
         }, "event"),
 })

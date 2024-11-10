@@ -12,19 +12,18 @@ export function _match(prop: string | null, search: string) {
     return prop?.toLowerCase().includes(search.toLowerCase());
 }
 
-export function matchApp(app: Application, term: string) {
-    const _match = (prop: string | null, search: string) => {
-        if (!prop)
-            return false;
-        if (!search)
-            return true;
-        return prop?.toLowerCase().includes(search.toLowerCase());
+export function searchOneApp(apps: Application[], term: string) {
+    const priorities = [
+        'name', 'desktop', 'icon_name', 'description', 'executable'
+    ];
+
+    for (const key of priorities) {
+        for (const app of apps) {
+            if (_match(app[key], term)) {
+                return app;
+            }
+        }
     }
 
-    const { name, desktop, description, executable, wm_class } = app;
-    return _match(name, term) ||
-        _match(wm_class, term) ||
-        _match(desktop, term) ||
-        _match(executable, term) ||
-        _match(description, term);
-};
+    return null;
+}
