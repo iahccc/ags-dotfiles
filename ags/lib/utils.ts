@@ -90,11 +90,14 @@ export function launchApp(app: Application) {
         .split(/\s+/)
         .filter(str => !str.startsWith("%") && !str.startsWith("@"))
         .join(" ")
-    getFocusedMonitorScale().then(scale => {
+    getFocusedMonitor().then(monitor => {
+        let scale = monitor.scale
+        let name = monitor.name
+
         if(exe.includes("flatpak")) {
             bash(`flatpak override --env=GDK_SCALE=${scale} --env=QT_AUTO_SCREEN_SCALE_FACTOR=1 --env=QT_SCALE_FACTOR=${scale} --user`)
         }
-        bash(`QT_AUTO_SCREEN_SCALE_FACTOR=1 && QT_SCALE_FACTOR=${scale} && GDK_SCALE=${scale} && ${exe} &`)
+        bash(`xrandr --output ${name} --primary && QT_AUTO_SCREEN_SCALE_FACTOR=1 && QT_SCALE_FACTOR=${scale} && GDK_SCALE=${scale} && ${exe} &`)
         app.frequency += 1
     })
 
@@ -134,11 +137,11 @@ export function debounce(fn, delay) {
 }
 
 /**
- * get focused monitor scale
+ * get focused monitor
  */
-export async function getFocusedMonitorScale() {
+export async function getFocusedMonitor() {
     const output = await bash(`hyprctl monitors -j`);
     const monitors = JSON.parse(output);
     const focusedMonitor = monitors.find(monitor => monitor.focused === true);
-    return focusedMonitor ? focusedMonitor.scale : 1;
+    return focusedMonitor;
 }
