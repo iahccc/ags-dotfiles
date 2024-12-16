@@ -14,7 +14,7 @@ export function _match(prop: string | null, search: string) {
 
 export function searchOneApp(apps: Application[], term: string) {
     const priorities = [
-        'name', 'desktop', 'icon_name', 'description', 'executable'
+        'wm-class', 'name', 'desktop', 'icon_name', 'description', 'executable'
     ];
 
     for (const key of priorities) {
